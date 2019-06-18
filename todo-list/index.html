@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Todoism</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="dist/style.css">
+</head>
+<body>
+  <nav>
+    <div class="nav-wrapper green lighten-2">
+      <a href="#" class="brand-logo center">Todoism</a>
+    </div>
+  </nav>
+  <div class="container main">
+    <div class="row">
+      <div class="col s12 input-field">
+        <input type="text" name="todo" placeholder="What needs to be done?">
+      </div>
+    </div>
+    <div class="row" id="tabs"></div>
+    <div class="row">
+      <div class="col s12">
+        <div id="todo-list"></div>
+      </div>
+    </div>
+  </div>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.1.1/handlebars.min.js"></script>
+  <script id="todo-template" type="text/x-handlebars-template">
+    <div class="todo-item card" data-id="{{id}}">
+      <a class="done-btn">
+        {{#if isDone}}
+          <i class="material-icons left">check_box</i>
+        {{else}}
+          <i class="material-icons left">check_box_outline_blank</i>
+        {{/if}}        
+      </a>
+      <span class="todo-body{{#if isDone}} done{{/if}}">{{body}}</span>
+      <span class="edit-btns right hide">
+        <a class="edit-btn"><i class="material-icons left">mode_edit</i></a>
+        <a class="delete-btn"><i class="material-icons left">clear</i></a>
+      </span>
+    </div>
+  </script>
+  <script id="edit-input-template" type="text/x-handlebars-template">
+    <input type="text" name="edit-input">
+  </script>
+  <script id="tabs-template" type="text/x-handlebars-template">
+    <div class="col l9 m12 s12">
+      <ul class="tabs">
+        <li class="tab col m4 s12">
+          <a id="tab-all" class="active blue-text" href="#">
+            All <small class="grey-text" id="count-all"></small>
+          </a>
+        </li>
+        <li class="tab col m4 s12">
+          <a id="tab-active" class="blue-text" href="#">
+            Active <small class="grey-text" id="count-active"></small>
+          </a>
+        </li>
+        <li class="tab col m4 s12">
+          <a id="tab-done" class="blue-text" href="#">
+            Done <small class="grey-text" id="count-done"></small>
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div class="col l3 hide-on-med-and-down">
+      <a id="clear-btn" class="btn red right"><i class="material-icons left">clear_all</i>Clear</a>
+    </div>
+  </script>
+  <script src="dist/bundle.js"></script>
+</body>
+</html>

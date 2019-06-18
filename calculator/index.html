@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <style>
+    .calculator {
+      width: 400px;
+      height: 300px;
+      border: 1px solid #d4d4d4;
+      margin: 100px auto 0;
+    }
+    .calculator__row {
+      height: 40px;
+      box-sizing: border-box;
+      display: flex;
+      justify-content: space-between;
+    }
+    .calculator__monitor {
+      margin: 16px;
+    }    
+    .calculator__input {
+      display: inline-block;
+      width: 368px;
+      height: 50px;
+      font-size: 40px;
+      border: 1px solid #d4d4d4;
+      text-align: right;
+      padding: 0 5px;
+    }    
+    .calculator__buttons {
+      height: 200px;
+      margin: 16px;
+      box-sizing: border-box;
+    }
+    .calculator__button {
+      width: 84px;
+      height: 32px;
+      box-sizing: border-box;
+      margin: 8px 0;
+      border: 1px solid #d4d4d4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: sans-serif;
+    }
+    .calculator__button:hover {
+      border: 1px solid #9e9e9e;
+      cursor: pointer;
+    }
+    .calculator__button--two-col {
+      width: 180px;
+    }
+    .calculator__button--grey {
+      background-color: #dddddd;
+    }
+    .calculator__button--orange {
+      background-color: #ff8d00;
+      border-style: none;
+    }
+    .calculator__button--orange:hover {
+      border-style: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="calculator">
+    <div class="calculator__monitor">
+      <input type="text" class="calculator__input calculator__row">
+    </div>
+    <div class="calculator__buttons">
+      <div class="calculator__row">
+        <div id="clear" class="calculator__button calculator__button--grey">AC</div>
+        <div id="division" class="calculator__button calculator__button--grey">÷</div>
+      </div>
+      <div class="calculator__row">
+        <div id="num7" class="calculator__button">7</div>
+        <div id="num8" class="calculator__button">8</div>
+        <div id="num9" class="calculator__button">9</div>
+        <div id="multiply" class="calculator__button calculator__button--grey">×</div>
+      </div>
+      <div class="calculator__row">
+        <div id="num4" class="calculator__button">4</div>
+        <div id="num5" class="calculator__button">5</div>
+        <div id="num6" class="calculator__button">6</div>
+        <div id="minus" class="calculator__button calculator__button--grey">-</div>
+      </div>
+      <div class="calculator__row">
+        <div id="num1" class="calculator__button">1</div>
+        <div id="num2" class="calculator__button">2</div>
+        <div id="num3" class="calculator__button">3</div>
+        <div id="plus" class="calculator__button calculator__button--grey">+</div>
+      </div>
+      <div class="calculator__row">
+        <div id="num0" class="calculator__button">0</div>
+        <div id="point" class="calculator__button">.</div>
+        <div id="equal" class="calculator__button calculator__button--two-col calculator__button--orange">=</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    
+    var app = {
+      init: function() {
+        let self = this;
+        self.inputElem = document.getElementsByClassName('calculator__input')[0];
+        self.inputString = '';
+        self.initNumberButtons();
+        self.initOperandButtons();
+        self.initDecimalPointButton();
+        self.initClearButton();
+        self.initEqualButton();
+        self.inputElem.addEventListener('keydown', e => {
+          e.preventDefault();
+        });
+        self.render();
+      },
+      render: function(caretPosition) {
+        let self = this;
+        self.inputElem.value = self.getRenderString();
+        self.inputElem.focus();
+        if (caretPosition) {
+          self.setCaretPosition(caretPosition);
+        }
+      },
+      clear: function() {
+        var self = this;
+        self.inputString = '';
+        self.render();
+      },
+      getRenderString: function() {
+        let self = this;
+        let renderString = '';
+        for (let i = 0; i < self.inputString.length; i++) {
+          if (self.inputString.charAt(i) === '*') {
+            renderString += '×';
+          } else if (self.inputString.charAt(i) === '/') {
+            renderString += '÷';
+          } else {
+            renderString += self.inputString.charAt(i);
+          }
+        }
+        if (renderString === '') {
+          renderString = '0';
+        }
+        return renderString;
+      },
+      setCaretPosition: function(pos) {
+        let self = this;
+        self.inputElem.setSelectionRange(pos, pos);
+      },
+      removeLeadingZeros: function() {
+        let self = this;
+        let resultString = '';
+        let isNumberBegin = true;
+        for (let i = 0; i < self.inputString.length; i++) {
+          let char = self.inputString.charAt(i);
+          let nextChar = self.inputString.charAt(i + 1);
+          if (isNumberBegin && char === '0' && (nextChar && nextChar !== '.')) {            
+            continue;
+          }
+          if ('+-*/'.indexOf(char) > -1) {
+            isNumberBegin = true;
+          } else {
+            isNumberBegin = false;
+          }
+          resultString += char;
+        }
+        self.inputString = resultString;
+      },
+      initNumberButtons: function() {
+        let self = this;
+        for (let i = 0; i <= 9; i++) {
+          document.getElementById('num' + i).addEventListener('click', e => {
+            self.inputString = self.inputString.slice(0, self.inputElem.selectionStart) + i +
+              self.inputString.slice(self.inputElem.selectionEnd);
+            self.removeLeadingZeros();                       
+            self.render(self.inputElem.selectionStart + 1)
+          });
+        }
+      },
+      initOperandButtons: function() {
+        let self = this;
+        let operands = new Map([['plus', '+'], ['minus', '-'], ['multiply', '*'], ['division', '/']]);
+        for (let opName of operands.keys()) {
+          document.getElementById(opName).addEventListener('click', function() {
+            if ('+-*/'.indexOf(self.inputString.charAt(self.inputString.length - 1)) > -1) {
+              self.inputString = self.inputString.slice(0, self.inputString.length - 1);
+            }
+            self.inputString += operands.get(opName);
+            self.render();
+          });
+        }
+      },
+      initDecimalPointButton: function() {
+        let self = this;
+        document.getElementById('point').addEventListener('click', function() {
+          if (self.getNumberByCaretPosition(self.inputElem.selectionStart).indexOf('.') === -1) {
+            self.inputString = self.inputString.slice(0, self.inputElem.selectionStart) + '.' +
+              self.inputString.slice(self.inputElem.selectionEnd);
+            self.render(self.inputElem.selectionStart + 1);
+          } else {
+            self.render(self.inputElem.selectionStart);
+          }          
+        });
+      },
+      initClearButton: function() {
+        let self = this;
+        document.getElementById('clear').addEventListener('click', function() {
+          self.clear();
+        });
+      },
+      initEqualButton: function() {
+        let self = this;
+        document.getElementById('equal').addEventListener('click', function() {
+          self.inputString = eval(self.inputString).toString();
+          self.render();
+        });
+      },
+      getNumberByCaretPosition: function(pos) {
+        let self = this;
+        let numberBegin, numberEnd, i;
+        for (i = pos; i >= 0; i--) {
+          let char = self.inputElem.value.charAt(i);
+          if (char && '+-×÷'.indexOf(char) > -1) {
+            break;
+          }
+        }
+        numberBegin = i > 0 ? i + 1 : 0;
+        for (i = pos; i < self.inputElem.value.length; i++) {
+          let char = self.inputElem.value.charAt(i);
+          if (char && '+-×÷'.indexOf(char) > -1) {
+            break;
+          }
+        }
+        numberEnd = i;
+        return self.inputElem.value.slice(numberBegin, numberEnd);
+      }
+    };
+    app.init();
+    
+  </script>
+</body>
+
+</html>
