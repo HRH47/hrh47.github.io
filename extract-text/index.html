@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>擷取文字小工具</title>
+    <style>
+      * {
+      }
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+        display: flex;
+      }
+
+      .buttons {
+        height: 100%;
+      }
+
+      button {
+        width: 100%;
+        font-size: 16px;
+        padding: 8px 12px;
+        margin-bottom: 10px;
+        position: relative;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        border: 1px solid black;
+        box-sizing: border-box;
+      }
+
+      #info {
+        color: green;
+        font-size: 16px;
+        position: relative;
+        text-align: center;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        margin-top: 0px;
+      }
+
+      textarea {
+        height: 100%;
+        width: 50%;
+        font-size: 16px;
+
+        border: 1px solid black;
+        box-sizing: border-box;
+      }
+    </style>
+  </head>
+  <body>
+    <textarea id="source"></textarea>
+    <div class="buttons">
+      <button id="extract">擷取文字</button>
+      <button id="copy">複製到剪貼簿</button>
+      <p id="info"></p>
+    </div>
+    <textarea id="target"></textarea>
+
+    <script>
+      const extractTextFromJson = () => {
+        const sourceElement = document.getElementById("source");
+        const infoElement = document.getElementById("info");
+        infoElement.innerText = "";
+        const sentences = JSON.parse(sourceElement.value).data.sentences;
+        return sentences.map((sentence) => sentence.content);
+      };
+      const extractElement = document.getElementById("extract");
+      extractElement.addEventListener("click", () => {
+        const textList = extractTextFromJson();
+        const targetElement = document.getElementById("target");
+        targetElement.value = textList.join("\n\n");
+      });
+      const copyElement = document.getElementById("copy");
+      copyElement.addEventListener("click", () => {
+        const targetElement = document.getElementById("target");
+        navigator.clipboard.writeText(targetElement.value).then(() => {
+          const infoElement = document.getElementById("info");
+          infoElement.innerText = "複製成功！";
+        });
+      });
+    </script>
+  </body>
+</html>
